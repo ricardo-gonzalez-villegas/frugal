@@ -1,0 +1,62 @@
+{% extends "./base.html" %}
+{% block title %}
+    Results
+{% endblock title %}
+
+{% block navbar %}
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'search' %}">Search</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+{% endblock navbar %}
+
+{% load static %}
+{% block content %}
+    <a href="{% url 'search' %}">Search</a>
+    {% if results %}
+        <div id="results">
+            <form method="post" id="favorite-form" action="{% url 'favorite' %}">
+                {% csrf_token %}
+                {% if results.meijer %}
+                    <h3>Meijer</h3>
+                    <div id="meijer-results">
+                        {% for result in results.meijer %}
+                            <div>
+                                <span>{{ result.name }}
+                                    <input type="radio" name="meijer" value="{{ result }}">
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if results.kroger %}
+                    <h3>Kroger</h3>
+                    <div id="kroger-results">
+                        {% for result in results.kroger %}
+                            <div>
+                                <span>{{ result.name }}
+                                    <input type="radio" name="kroger" value="{{ result }}">
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if results.walmart %}
+                    <h3>Walmart</h3>
+                    <div id="walmart-results">
+                        {% for result in results.walmart %}
+                            <div>
+                                <span>{{ result.name }}
+                                    <input type="radio" name="walmart" value="{{ result }}">
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <span>
+                    <input type="Text" name="favorite-name" />
+                    <button type="submit">Save</button>
+                </span>
+            </form>
+        </div>
+    {% endif %}
+{% endblock content %}

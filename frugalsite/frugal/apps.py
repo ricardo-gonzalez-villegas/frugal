@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class FrugalappConfig(AppConfig):
+class FrugalConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'frugalapp'
+    name = 'frugal'

@@ -1,0 +1,15 @@
+{% extends "./base.html" %}
+
+{% block title %}
+    Frugal
+{% endblock title %}
+
+{% block navbar %}
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'search' %}">Search</a></li>
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+{% endblock navbar %}
+
+{% block content %}
+        Hi {{ user.username }}!
+{% endblock content %}
