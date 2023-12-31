@@ -1,0 +1,22 @@
+{% extends "./base.html" %}
+{% block title %}
+    Favorites
+{% endblock title %}
+{% block navbar %}
+    <li>
+        <a href="{% url 'home' %}">Home</a>
+    </li>
+    <li>
+        <a href="{% url 'search' %}">Search</a>
+    </li>
+    <li>
+        <a href="{% url 'logout' %}">Logout</a>
+    </li>
+{% endblock navbar %}
+{% load static %}
+{% block content %}
+    {% for favorite in user_favorites %}
+        <a href="{% url 'details' favorite.id %} ">{{ favorite.favorite_name }}</a>
+        <br/>
+    {% endfor %}
+{% endblock content %}

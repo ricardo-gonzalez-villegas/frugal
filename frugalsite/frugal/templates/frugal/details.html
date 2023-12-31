@@ -1,0 +1,23 @@
+{% extends "./base.html" %}
+{% block title %}
+    Details
+{% endblock title %}
+{% block navbar %}
+<li>
+    <a href="{% url 'home' %}">Home</a>
+</li>
+<li>
+    <a href="{% url 'search' %}">Search</a>
+</li>
+<li>
+    <a href="{% url 'logout' %}">Logout</a>
+</li>
+{% endblock navbar %}
+{% load static %}
+{% block content %}
+    <h1>{{ user_favorite.favorite_name }}</h1>
+    {% for product in user_favorited_products %}
+        <p>{{ product.product_name }}</p>
+        <br />
+    {% endfor %}
+{% endblock content %}

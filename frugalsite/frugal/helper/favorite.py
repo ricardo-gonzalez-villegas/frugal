@@ -29,6 +29,7 @@ def favorite_products(request) -> Favorite:
             product.set_product_sale_price(float(data["sale_price"]))
 
         product.save()
+        
     if request.POST.get("kroger"):
         data = eval(request.POST["kroger"])
         product = Product(
@@ -47,6 +48,7 @@ def favorite_products(request) -> Favorite:
             product.set_product_sale_price(float(data["sale_price"]))
 
         product.save()
+        
     if request.POST.get("walmart"):
         data = eval(request.POST["walmart"])
         product = Product(
