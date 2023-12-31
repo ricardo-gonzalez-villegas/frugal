@@ -3,7 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from .scripts.search import SearchThread
+from .helper.search import SearchThread
+from .helper.favorite import favorite_products
 
 def welcome_view(request):
     return render(request, "frugal/welcome.html")
@@ -64,15 +65,8 @@ def results_view(request):
 @login_required(redirect_field_name="")
 def favorite_view(request):
     if request.POST:
-        if request.POST.get("meijer"):
-            print(request.POST["meijer"])
-        if request.POST.get("kroger"):
-            print(request.POST["kroger"])
-        if request.POST.get("walmart"):
-            print(request.POST["walmart"])
-        if request.POST.get("favorite-name"):
-            print(request.POST["favorite-name"])
-    return HttpResponseRedirect(reverse("details", args=("1",)))
+       favorite = favorite_products(request)
+    return HttpResponseRedirect(reverse("details", args=(favorite.pk,)))
 
 
 @login_required(redirect_field_name="")

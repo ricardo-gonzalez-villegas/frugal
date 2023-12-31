@@ -35,11 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-<<<<<<< HEAD
-    'frugalapp.apps.FrugalappConfig',
-=======
     'frugal.apps.FrugalConfig',
->>>>>>> 9fd34bf (deleted apps and created all views in single app)
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -135,8 +131,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-<<<<<<< HEAD
 LOGIN_REDIRECT_URL = "/"
-=======
 LOGIN_URL = "/login"
->>>>>>> 9fd34bf (deleted apps and created all views in single app)

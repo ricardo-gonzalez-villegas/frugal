@@ -1,10 +1,3 @@
-<<<<<<< HEAD:frugalsite/frugalapp/urls.py
-from django.contrib import admin
-from django.urls import include, path
-
-urlpatterns = [
-    path("", include("frugalapp.urls")),
-=======
 from django.urls import path
 
 from . import views
@@ -18,6 +11,5 @@ urlpatterns = [
     path("search", views.search_view, name="search"),
     path("results", views.results_view, name="results"),
     path("favorite", views.favorite_view, name="favorite"),
-    path("favorite/<int:favorite_id>", views.favorite_details, name="details")
->>>>>>> 9fd34bf (deleted apps and created all views in single app):frugalsite/frugal/urls.py
+    path("favorites/<str:favorite_id>/details", views.favorite_details, name="details")
 ]
