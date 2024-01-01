@@ -35,8 +35,13 @@ class Product(models.Model):
     def set_product_sale_price(self, sale_price: float):
         self.product_sale_price = sale_price
     
+   
+    
     def get_price(self):
         return self.product_price
+    
+    def get_sale_price(self):
+        return self.product_sale_price
     
     def __str__(self) -> str:
         return f'Product: {self.product_name}, from {self.store_name},  costs: {self.product_price}.'

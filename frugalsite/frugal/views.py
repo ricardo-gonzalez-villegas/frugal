@@ -1,4 +1,4 @@
-from multiprocessing import context
+from urllib import request
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
@@ -7,6 +7,7 @@ from django.urls import reverse
 from .helper.search import SearchThread
 from .helper.favorite import favorite_products
 from .models import Favorite, Product
+from django.contrib.auth.models import User
 
 
 def welcome_view(request):
@@ -14,7 +15,20 @@ def welcome_view(request):
 
 
 def registration_view(request):
-    return HttpResponse("Registration Index")
+    if request.POST:
+        username = request.POST["username"]
+        email = request.POST["email"]
+        password = request.POST["password"]
+        user = User.objects.create_user(
+            email=email, username=username, password=password
+        )
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect(reverse("home"))
+        else:
+            return HttpResponse("Error")
+    else:
+        return render(request, "frugal/register.html")
 
 
 def login_view(request):
