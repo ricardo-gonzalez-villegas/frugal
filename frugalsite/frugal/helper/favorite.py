@@ -3,12 +3,16 @@ from django.utils import timezone
 
 
 def favorite_products(request) -> Favorite:
+    prices = list()
+
     favorite_name = request.POST["favorite-name"]
+
     favorite = Favorite(
         user_id=request.user.id,
-        favorite_name=favorite_name,
+        name=favorite_name,
         date_created=timezone.now(),
     )
+
     favorite.save()
 
     if request.POST.get("meijer"):
@@ -17,10 +21,10 @@ def favorite_products(request) -> Favorite:
             user_id=request.user.id,
             favorite=favorite,
             store_name=data["store"],
-            product_name=data["name"],
-            product_store_id=int(data["store_id"]),
-            product_img_url=data["image_url"],
-            product_price=float(data["price"]),
+            name=data["name"],
+            store_id=data["store_id"],
+            imgage_url=data["image_url"],
+            price=float(data["price"]),
             date_created=timezone.now(),
             date_updated=timezone.now(),
         )
@@ -29,17 +33,19 @@ def favorite_products(request) -> Favorite:
             product.set_product_sale_price(float(data["sale_price"]))
 
         product.save()
-        
+
+        prices.append(float(data["price"]))
+
     if request.POST.get("kroger"):
         data = eval(request.POST["kroger"])
         product = Product(
             user_id=request.user.id,
             favorite=favorite,
             store_name=data["store"],
-            product_name=data["name"],
-            product_store_id=int(data["store_id"]),
-            product_img_url=data["image_url"],
-            product_price=float(data["price"]),
+            name=data["name"],
+            store_id=data["store_id"],
+            imgage_url=data["image_url"],
+            price=float(data["price"]),
             date_created=timezone.now(),
             date_updated=timezone.now(),
         )
@@ -48,17 +54,19 @@ def favorite_products(request) -> Favorite:
             product.set_product_sale_price(float(data["sale_price"]))
 
         product.save()
-        
+
+        prices.append(float(data["price"]))
+
     if request.POST.get("walmart"):
         data = eval(request.POST["walmart"])
         product = Product(
             user_id=request.user.id,
             favorite=favorite,
             store_name=data["store"],
-            product_name=data["name"],
-            product_store_id=int(data["store_id"]),
-            product_img_url=data["image_url"],
-            product_price=float(data["price"]),
+            name=data["name"],
+            store_id=data["store_id"],
+            imgage_url=data["image_url"],
+            price=float(data["price"]),
             date_created=timezone.now(),
             date_updated=timezone.now(),
         )
@@ -67,5 +75,11 @@ def favorite_products(request) -> Favorite:
             product.set_product_sale_price(float(data["sale_price"]))
 
         product.save()
+
+        prices.append(float(data["price"]))
+
+    favorite.set_average_price(prices=prices)
+    
+    favorite.save()
 
     return favorite

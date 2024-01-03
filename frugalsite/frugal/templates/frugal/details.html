@@ -4,9 +4,10 @@
 {% endblock title %}
 {% load static %}
 {% block content %}
-    <h1>{{ user_favorite.favorite_name }}</h1>
+    <h1>{{ user_favorite.name }}</h1>
+    <h3>{{ user_favorite.average_price }}</h3>
     {% for product in user_favorited_products %}
-        <p>{{ product.product_name }}</p>
+        <p>{{ product.name }}</p>
         <br />
     {% endfor %}
 {% endblock content %}

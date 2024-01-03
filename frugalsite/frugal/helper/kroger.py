@@ -51,7 +51,7 @@ def search_on_kroger(product: str) -> list:
                 )
 
                 product["store"] = "kroger"
-                product["store_id"] = int(id)
+                product["store_id"] = id
                 product["image_url"] = image_urls[i].get_attribute("src")
                 product["name"] = f"{products[i].text} {product_sizes[i].text}"
 
@@ -110,3 +110,70 @@ def search_on_kroger(product: str) -> list:
     driver.quit()
 
     return results
+
+
+def kroger_product_id_lookup(product_id: str):
+    driver = webdriver.Chrome(options=options)
+    driver.execute_script(
+        "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+    )
+    driver.get(
+        f"https://www.kroger.com/search?query={product_id}&searchType=default_search"
+    )
+    time.sleep(3)
+
+    prices = driver.find_elements(By.CLASS_NAME, "kds-Price")
+
+    product_prices = dict()
+
+    while True:
+        try:
+            for price in prices:
+                if len(price.text) == 0:
+                    continue
+                if price.text == "Sign In to Add":
+                    continue
+                if price.text == "Low Stock":
+                    continue
+                else:
+                    price = price.text.replace("\n", "")
+                    if "discounted from" in price:
+                        temp_price_list = price.split("discounted from")
+
+                        sale_price = re.search("\$\d+\.\d+", temp_price_list[0]).group()
+                        sale_price = format(float(sale_price.replace("$", "")), ".2f")
+                        regular_price = re.search(
+                            "\$\d+\.\d+", temp_price_list[1]
+                        ).group()
+                        regular_price = format(
+                            float(regular_price.replace("$", "")), ".2f"
+                        )
+
+                        product_prices["price"] = regular_price
+                        product_prices["sale_price"] = sale_price
+
+                    elif "about" in price:
+                        regular_price = re.search("\$\d+\.\d+", price).group()
+                        regular_price = format(
+                            float(regular_price.replace("$", "")), ".2f"
+                        )
+
+                        product_prices["price"] = regular_price
+                    elif "Prices May Vary" in price:
+                        regular_price = "Prices May Very"
+                        product_prices["price"] = regular_price
+                    else:
+                        regular_price = format(float(price.replace("$", "")), ".2f")
+                        product_prices["price"] = regular_price
+
+            break
+
+        except StaleElementReferenceException:
+            continue
+
+        except NoSuchElementException:
+            continue
+
+    driver.quit()
+
+    return product_prices

@@ -15,6 +15,7 @@ options.add_argument(
 )
 options.add_argument("--window-size=1920,1080")
 
+
 def search_on_meijer(product: str) -> list:
     driver = webdriver.Chrome(options=options)
     driver.execute_script(
@@ -49,7 +50,7 @@ def search_on_meijer(product: str) -> list:
                 product["store"] = "meijer"
                 product["name"] = products[i].text
                 id = ids[i].get_attribute("data-cnstrc-item-id")
-                product["store_id"] = int(id)
+                product["store_id"] = id
                 product["image_url"] = image_urls[i].get_attribute("src")
 
                 p = prices[i].text.split("\n")
@@ -84,3 +85,45 @@ def search_on_meijer(product: str) -> list:
 
     return results
 
+
+def meijer_product_id_lookup(product_id: str):
+    driver = webdriver.Chrome(options=options)
+    driver.execute_script(
+        "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+    )
+    driver.get(f"https://www.meijer.com/shopping/search.html?text={product_id}")
+    time.sleep(3)
+
+    prices = driver.find_elements(By.XPATH, "//div[@class='product-tile__price']/span")
+
+    product_prices = dict()
+
+    while True:
+        try:
+            if len(prices) >= 2:
+                price = re.search("\$\d+\.\d+", prices[1].text).group()
+                product_prices["price"] = format(
+                    float(price.replace("$", "").strip()), ".2f"
+                )
+
+                sale_price = re.search("\$\d+\.\d+", prices[0].text).group()
+                product_prices["sale_price"] = format(
+                    float(sale_price.replace("$", "").strip()), ".2f"
+                )
+            else:
+                price = re.search("\$\d+\.\d+", prices[0].text).group()
+                product_prices["price"] = format(
+                    float(price.replace("$", "").strip()), ".2f"
+                )
+
+            break
+
+        except StaleElementReferenceException:
+            continue
+
+        except NoSuchElementException:
+            continue
+
+    driver.quit()
+
+    return product_prices

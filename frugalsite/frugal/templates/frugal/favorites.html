@@ -5,7 +5,7 @@
 {% load static %}
 {% block content %}
     {% for favorite in user_favorites %}
-        <a href="{% url 'details' favorite.id %} ">{{ favorite.favorite_name }}</a>
+        <a href="{% url 'details' favorite.id %} ">{{ favorite.name }}</a>
         <br/>
     {% endfor %}
 {% endblock content %}

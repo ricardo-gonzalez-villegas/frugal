@@ -13,7 +13,8 @@ options.add_argument("--headless")
 options.add_argument(
     "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 )
-options.add_argument("--window-size=1920,1080")
+options.add_argument("--window-size=1920,2100")
+
 
 def search_on_walmart(product: str) -> list:
     driver = webdriver.Chrome(options=options)
@@ -69,7 +70,7 @@ def search_on_walmart(product: str) -> list:
                 product["name"] = priced_products[i].text
                 product["image_url"] = priced_image_urls[i].get_attribute("src")
                 id = re.findall(r"/(?=(\d+))\d+\?", priced_links[i])
-                product["store_id"] = int(id[0])
+                product["store_id"] = id[0]
 
                 temp_price_list = prices[i].text.split("\n")
 
@@ -97,3 +98,46 @@ def search_on_walmart(product: str) -> list:
     driver.quit()
 
     return results
+
+
+def walmart_product_id_lookup(product_id: str):
+    driver = webdriver.Chrome(options=options)
+    driver.execute_script(
+        "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+    )
+    driver.get(f"https://www.walmart.com/search?q={product_id}")
+    time.sleep(3)
+
+    prices_div = driver.find_element(
+        By.XPATH, '//div[@data-automation-id="product-price"]'
+    )
+
+    product_prices = dict()
+
+    while True:
+        try:
+            prices = prices_div.text.split("\n")
+
+            for price in prices:
+                if "current price" in price:
+                    current_price = re.search("\$\d+\.\d+", price).group()
+                    current_price = float(current_price.replace("$", "").strip())
+                    product_prices["price"] = format(current_price, ".2f")
+
+                elif "Was" in price:
+                    product_prices["sale_price"] = product_prices["price"]
+                    previous_price = re.search("\$\d+\.\d+", price).group()
+                    previous_price = float(previous_price.replace("$", "").strip())
+                    product_prices["price"] = format(previous_price, ".2f")
+
+            break
+
+        except StaleElementReferenceException:
+            continue
+
+        except NoSuchElementException:
+            continue
+
+    driver.quit()
+
+    return product_prices
