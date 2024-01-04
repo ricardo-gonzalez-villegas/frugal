@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from .helper.search import SearchThread
-from .helper.favorite import favorite_products
+from .helper.model_helpers import save_to_favorite_and_products, update_product_prices
 from .models import Favorite, Product
 from django.contrib.auth.models import User
 
@@ -82,7 +82,7 @@ def results_view(request):
 @login_required(redirect_field_name="")
 def favorite_view(request):
     if request.POST:
-        favorite = favorite_products(request)
+        favorite = save_to_favorite_and_products(request)
         return HttpResponseRedirect(reverse("details", args=(favorite.pk,)))
 
 
@@ -95,10 +95,25 @@ def favorites_view(request):
 
 @login_required(redirect_field_name="")
 def favorite_details(request, favorite_id):
-    user_favorite = Favorite.objects.get(pk=favorite_id)
-    user_favorited_products = Product.objects.filter(favorite_id=favorite_id)
-    context = {
-        "user_favorite": user_favorite,
-        "user_favorited_products": user_favorited_products,
-    }
+    if request.POST:
+        user_favorite = Favorite.objects.get(pk=favorite_id)
+        user_favorited_products = Product.objects.filter(favorite_id=favorite_id)
+        update_product_prices(user_favorite ,user_favorited_products)
+         
+        updated_user_favorite = Favorite.objects.get(pk=favorite_id)
+        updated_user_favorited_products = Product.objects.filter(favorite_id=favorite_id)
+        context = {
+            "user_favorite": updated_user_favorite,
+            "user_favorited_products": updated_user_favorited_products,
+        }
+    
+        return HttpResponseRedirect(reverse("details", args=(favorite_id,)))
+              
+    else:
+        user_favorite = Favorite.objects.get(pk=favorite_id)
+        user_favorited_products = Product.objects.filter(favorite_id=favorite_id)
+        context = {
+            "user_favorite": user_favorite,
+            "user_favorited_products": user_favorited_products,
+        }
     return render(request, "frugal/details.html", context)
