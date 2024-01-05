@@ -4,7 +4,6 @@
 {% endblock title %}
 {% load static %}
 {% block content %}
-    <a href="{% url 'search' %}">Search</a>
     {% if results %}
         <div id="results">
             <form method="post" id="favorite-form" action="{% url 'favorite' %}">

@@ -43,7 +43,7 @@ class Product(models.Model):
         self.update_date_updated()
 
     def set_sale_price(self, sale_price: float):
-        self.product_sale_price = sale_price
+        self.sale_price = sale_price
         self.update_date_updated()
         
     def update_date_updated(self):

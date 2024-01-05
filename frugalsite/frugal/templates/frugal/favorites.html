@@ -5,7 +5,13 @@
 {% load static %}
 {% block content %}
     {% for favorite in user_favorites %}
-        <a href="{% url 'details' favorite.id %} ">{{ favorite.name }}</a>
-        <br/>
+        <span>
+            <a href="{% url 'details' favorite.id %} ">{{ favorite.name }}</a>
+            <form action="{% url 'delete' favorite.id %}" method="post">
+                {% csrf_token %}
+                <button>Delete</button>
+            </form>
+        </span>
+        <br />
     {% endfor %}
 {% endblock content %}

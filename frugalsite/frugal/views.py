@@ -1,4 +1,5 @@
 from urllib import request
+from webbrowser import get
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
@@ -98,17 +99,19 @@ def favorite_details(request, favorite_id):
     if request.POST:
         user_favorite = Favorite.objects.get(pk=favorite_id)
         user_favorited_products = Product.objects.filter(favorite_id=favorite_id)
-        update_product_prices(user_favorite ,user_favorited_products)
-         
+        update_product_prices(user_favorite, user_favorited_products)
+
         updated_user_favorite = Favorite.objects.get(pk=favorite_id)
-        updated_user_favorited_products = Product.objects.filter(favorite_id=favorite_id)
+        updated_user_favorited_products = Product.objects.filter(
+            favorite_id=favorite_id
+        )
         context = {
             "user_favorite": updated_user_favorite,
             "user_favorited_products": updated_user_favorited_products,
         }
-    
+
         return HttpResponseRedirect(reverse("details", args=(favorite_id,)))
-              
+
     else:
         user_favorite = Favorite.objects.get(pk=favorite_id)
         user_favorited_products = Product.objects.filter(favorite_id=favorite_id)
@@ -117,3 +120,10 @@ def favorite_details(request, favorite_id):
             "user_favorited_products": user_favorited_products,
         }
     return render(request, "frugal/details.html", context)
+
+
+@login_required(redirect_field_name="")
+def favorite_delete(request, favorite_id):
+    if request.POST:
+        Favorite.objects.get(pk=favorite_id).delete()
+        return HttpResponseRedirect(reverse("favorites"))
