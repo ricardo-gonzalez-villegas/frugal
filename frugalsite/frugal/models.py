@@ -30,7 +30,7 @@ class Product(models.Model):
     user_id = models.IntegerField(default=0)
     favorite = models.ForeignKey(Favorite, on_delete=models.CASCADE)
     store_name = models.CharField(max_length=20)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=500)
     store_id = models.CharField()
     imgage_url = models.CharField()
     price = models.FloatField(default=0.00)

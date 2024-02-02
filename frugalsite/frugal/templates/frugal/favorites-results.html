@@ -1,0 +1,11 @@
+{% if user_favorites %}
+        {% for favorite in user_favorites %}
+            <span>
+                <a href="{% url 'details' favorite.id %} ">{{ favorite.name }}</a>
+                <button value="{{ favorite.id }}">Delete</button>
+            </span>
+        </br>
+    {% endfor %}
+{% else %}
+    <p>No Favorites</p>
+{% endif %}

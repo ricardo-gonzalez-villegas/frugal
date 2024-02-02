@@ -1,3 +1,4 @@
+from re import search
 from urllib import request
 from webbrowser import get
 from django.shortcuts import get_object_or_404, render
@@ -9,6 +10,8 @@ from .helper.search import SearchThread
 from .helper.model_helpers import save_to_favorite_and_products, update_product_prices
 from .models import Favorite, Product
 from django.contrib.auth.models import User
+from django.template.loader import render_to_string
+from django.http import JsonResponse
 
 
 def welcome_view(request):
@@ -80,6 +83,7 @@ def results_view(request):
     return render(request, "frugal/results.html", context)
 
 
+# saves linked products under a unique favorite id
 @login_required(redirect_field_name="")
 def favorite_view(request):
     if request.POST:
@@ -87,13 +91,32 @@ def favorite_view(request):
         return HttpResponseRedirect(reverse("details", args=(favorite.pk,)))
 
 
+# displays all logged in user's favorites
 @login_required(redirect_field_name="")
 def favorites_view(request):
-    user_favorites = Favorite.objects.filter(user_id=request.user.id)
-    context = {"user_favorites": user_favorites}
-    return render(request, "frugal/favorites.html", context)
+    is_ajax_request = request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest"
+    if is_ajax_request:
+        search_param = request.POST.get("search_param")
+        filtered_favorites = Favorite.objects.filter(
+            name__icontains=search_param, user_id=request.user.id
+        )
+
+        html = render_to_string(
+            template_name="frugal/favorites-results.html",
+            context={"user_favorites": filtered_favorites},
+        )
+
+        data_dict = {"html_from_view": html}
+        
+        return JsonResponse(data=data_dict)
+    else:
+        user_favorites = Favorite.objects.filter(user_id=request.user.id)
+        context = {"user_favorites": user_favorites}
+
+        return render(request, "frugal/favorites.html", context)
 
 
+# displays all details for given favorite id
 @login_required(redirect_field_name="")
 def favorite_details(request, favorite_id):
     if request.POST:
@@ -119,11 +142,31 @@ def favorite_details(request, favorite_id):
             "user_favorite": user_favorite,
             "user_favorited_products": user_favorited_products,
         }
+
     return render(request, "frugal/details.html", context)
 
 
+# checks if favorite was created by user before deleting
 @login_required(redirect_field_name="")
 def favorite_delete(request, favorite_id):
-    if request.POST:
-        Favorite.objects.get(pk=favorite_id).delete()
-        return HttpResponseRedirect(reverse("favorites"))
+    is_ajax_request = request.META.get("HTTP_X_REQUESTED_WITH") == "XMLHttpRequest"
+    if is_ajax_request:
+        id = request.POST.get("favorite_id")
+        favorite = Favorite.objects.get(pk=id, user_id=request.user.id)
+        
+        favorite.delete()
+
+        search_param = request.POST.get("search_param")
+        filtered_favorites = Favorite.objects.filter(name__icontains=search_param)
+
+        html = render_to_string(
+            template_name="frugal/favorites-results.html",
+            context={"user_favorites": filtered_favorites},
+        )
+
+        data_dict = {"html_from_view": html}
+        return JsonResponse(data=data_dict)
+    
+@login_required(redirect_field_name="")
+def recipes_view(request):
+    return HttpResponse("Recipes")

@@ -1,17 +1,21 @@
 {% extends "./base.html" %}
+{% load static %}
 {% block title %}
     Favorites
 {% endblock title %}
-{% load static %}
+
 {% block content %}
-    {% for favorite in user_favorites %}
-        <span>
-            <a href="{% url 'details' favorite.id %} ">{{ favorite.name }}</a>
-            <form action="{% url 'delete' favorite.id %}" method="post">
-                {% csrf_token %}
-                <button>Delete</button>
-            </form>
-        </span>
-        <br />
-    {% endfor %}
+    <div>
+        <form id="search-form">
+            {% csrf_token %}
+            <input id="search-input" type="text" placeholder="Search Favorites">
+        </form>
+    </div>
+    <form id="results-form">
+        {% csrf_token %}
+    </form>
+    <div id="favorites-results">{% include "./favorites-results.html" %}</div>
 {% endblock content %}
+{% block scripts %}
+            <script type="text/javascript" src="{% static "javascript/main.js" defer%}"></script>
+{% endblock scripts %}
